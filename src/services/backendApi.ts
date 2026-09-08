@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:5001';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
 export interface LoginResponse {
   success: boolean;
@@ -17,7 +17,7 @@ export interface RegisterResponse {
 export const backendApi = {
   // Worker Authentication
   login: async (email: string, password: string): Promise<LoginResponse> => {
-    const response = await fetch(`${API_BASE_URL}/auth/login`, {
+    const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -34,7 +34,7 @@ export const backendApi = {
     password: string;
     role: string;
   }): Promise<RegisterResponse> => {
-    const response = await fetch(`${API_BASE_URL}/auth/register`, {
+    const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -45,7 +45,7 @@ export const backendApi = {
   },
 
   logout: async (token: string): Promise<any> => {
-    const response = await fetch(`${API_BASE_URL}/auth/logout`, {
+    const response = await fetch(`${API_BASE_URL}/api/auth/logout`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -56,7 +56,7 @@ export const backendApi = {
   },
 
   getMe: async (token: string): Promise<any> => {
-    const response = await fetch(`${API_BASE_URL}/auth/me`, {
+    const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
