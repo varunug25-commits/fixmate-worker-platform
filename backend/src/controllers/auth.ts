@@ -50,6 +50,7 @@ export const register = async (
     }
 
     // Call Supabase signUp
+    console.log('Attempting Supabase signup for:', email);
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -63,6 +64,7 @@ export const register = async (
     });
 
     if (error) {
+      console.error('Supabase signup error:', error);
       res.status(400).json({
         success: false,
         message: error.message,
@@ -77,6 +79,7 @@ export const register = async (
       session: data.session,
     });
   } catch (err) {
+    console.error('Registration error:', err);
     next(err);
   }
 };
@@ -98,12 +101,14 @@ export const login = async (
     }
 
     // Call Supabase signInWithPassword
+    console.log('Attempting Supabase login for:', email);
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
     if (error) {
+      console.error('Supabase login error:', error);
       res.status(401).json({
         success: false,
         message: error.message,
@@ -118,6 +123,7 @@ export const login = async (
       session: data.session,
     });
   } catch (err) {
+    console.error('Login error:', err);
     next(err);
   }
 };

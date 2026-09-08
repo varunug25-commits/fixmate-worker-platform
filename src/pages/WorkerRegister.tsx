@@ -94,14 +94,10 @@ export const WorkerRegister: React.FC = () => {
       if (response.success) {
         navigate('/worker-login');
       } else {
-        // Fallback to demo mode if backend fails
-        console.warn('Backend registration failed, using demo mode:', response.message);
-        navigate('/worker-login');
+        setError(response.message || 'Registration failed. Please try again.');
       }
     } catch (err: any) {
-      // Fallback to demo mode on network error
-      console.warn('Backend connection failed, using demo mode:', err);
-      navigate('/worker-login');
+      setError('Registration failed. Please check your connection and try again.');
     } finally {
       setLoading(false);
     }
