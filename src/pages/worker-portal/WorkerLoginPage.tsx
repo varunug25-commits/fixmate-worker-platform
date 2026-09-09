@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Wrench, 
@@ -11,6 +11,7 @@ import {
   UserCheck
 } from 'lucide-react';
 import { EXPERTISE_BRANCHES } from './data/workerMockData';
+import gsap from 'gsap';
 
 export const WorkerLoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -20,6 +21,58 @@ export const WorkerLoginPage: React.FC = () => {
   const [isDemoMode, setIsDemoMode] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  
+  const containerRef = useRef<HTMLDivElement>(null);
+  const leftColumnRef = useRef<HTMLDivElement>(null);
+  const rightColumnRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const branchSelectorRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Animate container entrance
+    gsap.fromTo(containerRef.current, 
+      { opacity: 0, scale: 0.95 },
+      { opacity: 1, scale: 1, duration: 0.8, ease: "power3.out" }
+    );
+
+    // Animate left column
+    gsap.fromTo(leftColumnRef.current,
+      { opacity: 0, x: -50 },
+      { opacity: 1, x: 0, duration: 0.8, ease: "power2.out", delay: 0.2 }
+    );
+
+    // Animate right column
+    gsap.fromTo(rightColumnRef.current,
+      { opacity: 0, x: 50 },
+      { opacity: 1, x: 0, duration: 0.8, ease: "power2.out", delay: 0.3 }
+    );
+
+    // Animate form elements
+    gsap.fromTo(formRef.current?.children || [],
+      { opacity: 0, y: 20 },
+      { 
+        opacity: 1, 
+        y: 0, 
+        duration: 0.5, 
+        stagger: 0.1, 
+        ease: "power2.out",
+        delay: 0.5
+      }
+    );
+
+    // Animate branch selector buttons
+    gsap.fromTo(branchSelectorRef.current?.children || [],
+      { opacity: 0, scale: 0.8 },
+      { 
+        opacity: 1, 
+        scale: 1, 
+        duration: 0.4, 
+        stagger: 0.05, 
+        ease: "back.out(1.7)",
+        delay: 0.7
+      }
+    );
+  }, []);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,7 +104,7 @@ export const WorkerLoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-center py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden font-sans">
+    <div ref={containerRef} className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-center py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden font-sans">
       {/* Background Glow Shapes */}
       <div className="absolute -top-40 -left-40 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl pointer-events-none" />
@@ -59,7 +112,7 @@ export const WorkerLoginPage: React.FC = () => {
       <div className="max-w-5xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
         
         {/* Left Column: Branding & Value Props */}
-        <div className="lg:col-span-5 space-y-6 text-left">
+        <div ref={leftColumnRef} className="lg:col-span-5 space-y-6 text-left">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/30">
               <Wrench className="w-6 h-6 text-white" />
@@ -113,7 +166,7 @@ export const WorkerLoginPage: React.FC = () => {
         </div>
 
         {/* Right Column: Interactive Login Card */}
-        <div className="lg:col-span-7">
+        <div ref={rightColumnRef} className="lg:col-span-7">
           <div className="bg-slate-900/90 border border-slate-800 backdrop-blur-xl p-6 sm:p-8 rounded-3xl shadow-2xl shadow-black/80">
             
             <div className="mb-6">
@@ -125,7 +178,7 @@ export const WorkerLoginPage: React.FC = () => {
             </div>
 
             {/* Branch / Expertise Selector */}
-            <div className="mb-6">
+            <div ref={branchSelectorRef} className="mb-6">
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">
                 Choose Your Branch / Expertise:
               </label>
@@ -163,7 +216,7 @@ export const WorkerLoginPage: React.FC = () => {
             )}
 
             {/* Login Form */}
-            <form onSubmit={handleLogin} className="space-y-4">
+            <form ref={formRef} onSubmit={handleLogin} className="space-y-4">
               <div>
                 <label className="block text-xs font-medium text-slate-400 mb-1">Registered Phone Number / Email</label>
                 <div className="relative">
