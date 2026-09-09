@@ -35,6 +35,7 @@ export const WorkerRegister: React.FC = () => {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [useDemoMode, setUseDemoMode] = useState(false);
 
   const handleNext = () => {
     setError('');
@@ -80,6 +81,13 @@ export const WorkerRegister: React.FC = () => {
     }
 
     setLoading(true);
+
+    if (useDemoMode) {
+      // Demo mode - skip backend
+      navigate('/worker-login');
+      setLoading(false);
+      return;
+    }
 
     try {
       // Call backend API
@@ -244,6 +252,18 @@ export const WorkerRegister: React.FC = () => {
                   className="pl-10"
                 />
               </div>
+            </div>
+
+            <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={useDemoMode}
+                  onChange={(e) => setUseDemoMode(e.target.checked)}
+                  className="w-4 h-4 text-blue-600 rounded"
+                />
+                <span className="text-sm text-blue-800">Use Demo Mode (skip backend)</span>
+              </label>
             </div>
 
             <div className="mt-6 p-4 bg-blue-50 rounded-lg">

@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { Card } from '../components/Card';
 import { User, Lock, ArrowRight, CheckCircle, Wrench, Zap, Droplet, Hammer, Broom, Palette, Wrench as WrenchIcon, Sprout, Snowflake } from 'lucide-react';
 import { backendApi } from '../services/backendApi';
+import gsap from 'gsap';
 
 const workerTypes = [
   { id: 'electrician', name: 'Electrician', icon: Zap, description: 'Electrical repairs, wiring' },
@@ -24,6 +25,45 @@ export const WorkerLogin: React.FC = () => {
   const [selectedWorkerType, setSelectedWorkerType] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [useDemoMode, setUseDemoMode] = useState(false);
+  
+  const containerRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const workerTypeRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Animate container entrance
+    gsap.fromTo(containerRef.current, 
+      { opacity: 0, y: 30 },
+      { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }
+    );
+
+    // Animate form elements sequentially
+    gsap.fromTo(formRef.current?.children || [],
+      { opacity: 0, y: 20 },
+      { 
+        opacity: 1, 
+        y: 0, 
+        duration: 0.6, 
+        stagger: 0.1, 
+        ease: "power2.out",
+        delay: 0.3
+      }
+    );
+
+    // Animate worker type buttons
+    gsap.fromTo(workerTypeRef.current?.children || [],
+      { opacity: 0, scale: 0.8 },
+      { 
+        opacity: 1, 
+        scale: 1, 
+        duration: 0.5, 
+        stagger: 0.05, 
+        ease: "back.out(1.7)",
+        delay: 0.5
+      }
+    );
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,6 +75,19 @@ export const WorkerLogin: React.FC = () => {
     }
     
     setLoading(true);
+
+    if (useDemoMode) {
+      // Demo mode - skip backend
+      localStorage.setItem('auth_token', 'demo_token');
+      localStorage.setItem('user_role', 'worker');
+      localStorage.setItem('user_email', email);
+      localStorage.setItem('worker_type', selectedWorkerType);
+      localStorage.setItem('user_id', 'demo_user_id');
+      localStorage.setItem('demo_mode', 'true');
+      navigate('/worker');
+      setLoading(false);
+      return;
+    }
 
     try {
       // Call backend API
@@ -63,7 +116,7 @@ export const WorkerLogin: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div ref={containerRef} className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl w-full grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
         {/* Left Side - Branding */}
         <div className="hidden md:block">
@@ -102,7 +155,7 @@ export const WorkerLogin: React.FC = () => {
           
           <Card className="p-8">
             {/* Worker Type Selection */}
-            <div className="mb-6">
+            <div ref={workerTypeRef} className="mb-6">
               <h3 className="text-sm font-semibold text-gray-700 mb-3">Select Your Profession</h3>
               <div className="grid grid-cols-4 gap-2">
                 {workerTypes.map((type) => {
@@ -130,7 +183,20 @@ export const WorkerLogin: React.FC = () => {
                 {error}
               </div>
             )}
-            <form onSubmit={handleLogin} className="space-y-6">
+            
+            <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={useDemoMode}
+                  onChange={(e) => setUseDemoMode(e.target.checked)}
+                  className="w-4 h-4 text-blue-600 rounded"
+                />
+                <span className="text-sm text-blue-800">Use Demo Mode (skip backend)</span>
+              </label>
+            </div>
+            
+            <form ref={formRef} onSubmit={handleLogin} className="space-y-6">
               <div className="relative">
                 <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <Input
